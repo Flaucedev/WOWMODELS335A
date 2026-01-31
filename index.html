@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Northrend Vault – WotLK 3.3.5a</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=EB+Garamond:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --panel: #11151d;
+      --border: #1a2535;
+      --accent: #00d4ff;
+      --accent-dark: #0099bb;
+      --text: #d8e0e8;
+      --text-dim: #a0b0c0;
+      --gold: #c9a95c;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'EB Garamond', Georgia, serif;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(0,212,255,0.05) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(201,169,92,0.03) 0%, transparent 50%);
+    }
+
+    header {
+      background: linear-gradient(to bottom, #0a0e15, #11151d);
+      border-bottom: 2px solid var(--border);
+      padding: 1.5rem 1rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+    }
+
+    h1 {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(2.2rem, 7vw, 4rem);
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(0,212,255,0.5), 2px 2px 0 #000;
+    }
+
+    .subtitle { color: var(--text-dim); font-size: 1.1rem; margin-top: 0.3rem; }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar { order: 2; margin-top: 2rem; }
+      .content { order: 1; }
+    }
+
+    .content { }
+    .sidebar {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      height: fit-content;
+      position: sticky;
+      top: 1rem;
+    }
+
+    .sidebar h3 {
+      color: var(--accent);
+      font-family: 'Exo 2', sans-serif;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.6rem;
+    }
+
+    .recent-item {
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #1a2535;
+    }
+
+    .recent-item:last-child { border-bottom: none; }
+
+    .recent-item a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.95rem;
+      display: block;
+    }
+
+    .recent-item a:hover { color: #ffffff; }
+
+    .login-box, .upload-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.8rem;
+      margin: 1.5rem 0;
+      max-width: 500px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    }
+
+    .login-box h2, .upload-box h2 {
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 1.2rem;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      background: #0a0e15;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(0,212,255,0.25);
+      outline: none;
+    }
+
+    button {
+      background: linear-gradient(to bottom, #1e5c7a, #0f3d52);
+      color: white;
+      border: 1px solid var(--accent-dark);
+      padding: 0.9rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: linear-gradient(to bottom, #2a80a8, #1a5c7a);
+      box-shadow: 0 0 15px rgba(0,212,255,0.5);
+    }
+
+    .hidden { display: none; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .filters input, .filters select {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0,212,255,0.18);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .card-content {
+      padding: 1.2rem;
+    }
+
+    .card h3 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .card .category {
+      background: #1a2535;
+      color: var(--accent);
+      padding: 0.25rem 0.7rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      display: inline-block;
+      margin-bottom: 0.6rem;
+    }
+
+    .card p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.45;
+      margin-bottom: 0.8rem;
+    }
+
+    .btn-download {
+      display: inline-block;
+      background: linear-gradient(to bottom, var(--accent), var(--accent-dark));
+      color: #000;
+      font-weight: bold;
+      padding: 0.7rem 1.4rem;
+      border-radius: 4px;
+      text-decoration: none;
+      margin-top: 0.6rem;
+      transition: all 0.2s;
+    }
+
+    .btn-download:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,212,255,0.4);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 600px) {
+      .main-container { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Northrend Vault</h1>
+  <div class="subtitle">Addons • Mods • Macros • UI – Wrath of the Lich King 3.3.5a</div>
+</header>
+
+<div class="main-container">
+
+  <div class="content">
+
+    <!-- Login / Upload -->
+    <div class="login-box" id="loginBox">
+      <h2>Admin Login</h2>
+      <input type="text" id="username" placeholder="Usuario" autocomplete="off"/>
+      <input type="password" id="password" placeholder="Contraseña"/>
+      <button onclick="login()">Entrar</button>
+    </div>
+
+    <div class="upload-box hidden" id="uploadBox">
+      <h2>Publicar nuevo recurso</h2>
+      <input type="text" id="title" placeholder="Título del addon/mod" required/>
+      <textarea id="description" rows="4" placeholder="Descripción breve..."></textarea>
+      <select id="category" required>
+        <option value="" disabled selected>→ Categoría</option>
+        <option value="UI">Interfaz (UI)</option>
+        <option value="Addons">Addons Funcionales</option>
+        <option value="Mods">Mods Gráficos / Texturas</option>
+        <option value="Macros">Macros / WeakAuras</option>
+        <option value="Otros">Otros</option>
+      </select>
+      <input type="file" id="photo" accept="image/*" />
+      <input type="url" id="downloadUrl" placeholder="https://... (link directo al .zip/.rar)" />
+      <small style="color:#888; display:block; margin:0.5rem 0 1rem;">Sube el archivo a GitHub Releases, Mega, MediaFire, etc. y pega el link directo aquí</small>
+
+      <button onclick="addEntry()">Publicar</button>
+      <button onclick="logout()" style="background:#3a1f1f; margin-left:1rem;">Cerrar sesión</button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters">
+      <input type="text" id="search" placeholder="Buscar por nombre o descripción..." oninput="filterEntries()"/>
+      <select id="filterCat" onchange="filterEntries()">
+        <option value="">Todas las categorías</option>
+        <option value="UI">Interfaz (UI)</option>
+        <option value="Addons">Addons Funcionales</option>
+        <option value="Mods">Mods Gráficos / Texturas</option>
+        <option value="Macros">Macros / WeakAuras</option>
+        <option value="Otros">Otros</option>
+      </select>
+    </div>
+
+    <!-- Grid principal -->
+    <div class="grid" id="grid"></div>
+
+  </div>
+
+  <!-- Sidebar últimos subidos -->
+  <aside class="sidebar">
+    <h3>Últimos archivos subidos</h3>
+    <div id="recentList"></div>
+  </aside>
+
+</div>
+
+<footer>
+  Fan-site no oficial • Solo uso privado/educativo • No afiliado con Blizzard
+</footer>
+
+<script>
+  const ADMIN_USER = "admin";
+  const ADMIN_PASS = "wotlk335"; // ¡cámbialo!
+
+  let isAdmin = localStorage.getItem("isAdmin") === "true";
+  let entries = JSON.parse(localStorage.getItem("vaultEntries")) || [];
+
+  const loginBox   = document.getElementById("loginBox");
+  const uploadBox  = document.getElementById("uploadBox");
+  const grid       = document.getElementById("grid");
+  const recentList = document.getElementById("recentList");
+
+  function checkAdmin() {
+    if (isAdmin) {
+      loginBox.classList.add("hidden");
+      uploadBox.classList.remove("hidden");
+    } else {
+      loginBox.classList.remove("hidden");
+      uploadBox.classList.add("hidden");
+    }
+    renderAll();
+  }
+
+  function login() {
+    const u = document.getElementById("username").value.trim();
+    const p = document.getElementById("password").value;
+    if (u === ADMIN_USER && p === ADMIN_PASS) {
+      localStorage.setItem("isAdmin", "true");
+      isAdmin = true;
+      checkAdmin();
+    } else {
+      alert("Credenciales incorrectas");
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("isAdmin");
+    isAdmin = false;
+    checkAdmin();
+  }
+
+  async function addEntry() {
+    const title = document.getElementById("title").value.trim();
+    const desc  = document.getElementById("description").value.trim();
+    const cat   = document.getElementById("category").value;
+    const url   = document.getElementById("downloadUrl").value.trim();
+    const photoFile = document.getElementById("photo").files[0];
+
+    if (!title || !cat) {
+      alert("Título y categoría son obligatorios");
+      return;
+    }
+    if (!url) {
+      if (!confirm("¿Estás seguro de publicar sin link de descarga?")) return;
+    }
+
+    let photoData = "";
+    if (photoFile) {
+      photoData = await fileToBase64(photoFile);
+    }
+
+    const entry = {
+      id: Date.now(),
+      title,
+      description: desc || "Sin descripción",
+      category: cat,
+      photo: photoData,
+      downloadUrl: url,
+      date: new Date().toLocaleDateString("es-ES")
+    };
+
+    entries.unshift(entry);
+    saveEntries();
+    renderAll();
+
+    // limpiar
+    document.getElementById("title").value = "";
+    document.getElementById("description").value = "";
+    document.getElementById("category").value = "";
+    document.getElementById("downloadUrl").value = "";
+    document.getElementById("photo").value = "";
+  }
+
+  function fileToBase64(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+
+  function saveEntries() {
+    localStorage.setItem("vaultEntries", JSON.stringify(entries));
+  }
+
+  function renderAll() {
+    renderEntries(entries);
+    renderRecent();
+  }
+
+  function renderEntries(list = entries) {
+    grid.innerHTML = list.length ? "" : "<p style='text-align:center; color:#666; padding:3rem;'>No hay recursos aún</p>";
+
+    list.forEach(e => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const imgHtml = e.photo 
+        ? `<img src="${e.photo}" alt="${e.title}">`
+        : `<div style="height:180px; background:#1a2535; display:flex; align-items:center; justify-content:center; color:#555;">Sin preview</div>`;
+
+      const btnHtml = e.downloadUrl
+        ? `<a href="${e.downloadUrl}" target="_blank" rel="noopener" class="btn-download">Descargar</a>`
+        : `<small style="color:#777;">Sin archivo disponible</small>`;
+
+      card.innerHTML = `
+        ${imgHtml}
+        <div class="card-content">
+          <div class="category">${e.category}</div>
+          <h3>${e.title}</h3>
+          <p>${e.description.substring(0,140)}${e.description.length>140?'...':''}</p>
+          <small style="color:#777;">${e.date}</small>
+          <br>
+          ${btnHtml}
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function renderRecent() {
+    recentList.innerHTML = "";
+    const recent = [...entries].slice(0,6);
+
+    if (!recent.length) {
+      recentList.innerHTML = "<p style='color:#666; font-style:italic;'>Aún no hay publicaciones</p>";
+      return;
+    }
+
+    recent.forEach(e => {
+      const div = document.createElement("div");
+      div.className = "recent-item";
+      div.innerHTML = `<a href="#grid" onclick="document.getElementById('search').value='${e.title}'; filterEntries();">${e.title}</a>`;
+      recentList.appendChild(div);
+    });
+  }
+
+  function filterEntries() {
+    const q = document.getElementById("search").value.toLowerCase().trim();
+    const cat = document.getElementById("filterCat").value;
+
+    let filtered = entries;
+
+    if (q) {
+      filtered = filtered.filter(e => 
+        e.title.toLowerCase().includes(q) || 
+        e.description.toLowerCase().includes(q)
+      );
+    }
+    if (cat) {
+      filtered = filtered.filter(e => e.category === cat);
+    }
+
+    renderEntries(filtered);
+  }
+
+  // Inicio
+  checkAdmin();
+</script>
+</body>
+</html>
